@@ -170,15 +170,27 @@ ws://192.168.0.42:8123/client/foo/wss/{wss-server}:{port}/{path}
 ```
 ws://192.168.0.42:8123/client/foo/ws/{ws-server}:{port}/{path}
 ```
-```
-ssh -o ProxyCommand='ncat --proxy {remotedial-server}:{socks5-port} --proxy-type socks5 --proxy-auth foo:pass %h %p' {user}@{dst_ip}
-```
 
 If TLS is required at the entry point, use a reverse proxy such as nginx with an SSL certificate.
 
 where `foo` is the hardcoded client ID for this test server.
 
 This test server only supports GET requests.
+
+### TCP Usage
+Start remotedialer servers with the `-socks5-listen :2222` flag for tcp:
+```
+./server/server -debug -id remotedial-server -token aaa -listen :8123  -socks5-listen :2222
+```
+
+SSH client usage with ncat:
+```
+ssh -o ProxyCommand='ncat --proxy {remotedial-server}:{socks5-port} --proxy-type socks5 --proxy-auth foo:pass %h %p' {user}@{dst_ip}
+```
+or with socat (version after 1.8.1)
+```
+ssh -o ProxyCommand='socat - SOCKS5:{remotedial-server}:{dst_ip}:{dst_port},socksport={socks5-port},socksuser=foo,sockspass=pass' {user}@{dst_ip}
+```
 
 ### HA Usage
 
@@ -198,6 +210,7 @@ Then start two peer remotedialer servers with the `-peers id:token:url` flag:
 ./server/server -debug -id first -token aaa -listen :8123 -peers second:aaa:ws://localhost:8124/connect &
 ./server/server -debug -id second -token aaa -listen :8124 -peers first:aaa:ws://localhost:8123/connect
 ```
+
 
 Then connect a client to the first server, eg:
 ```shell
