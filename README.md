@@ -170,6 +170,10 @@ ws://192.168.0.42:8123/client/foo/wss/{wss-server}:{port}/{path}
 ```
 ws://192.168.0.42:8123/client/foo/ws/{ws-server}:{port}/{path}
 ```
+```
+ssh -o ProxyCommand='ncat --proxy {remotedial-server}:{socks5-port} --proxy-type socks5 --proxy-auth foo:pass %h %p' {user}@{dst_ip}
+```
+
 If TLS is required at the entry point, use a reverse proxy such as nginx with an SSL certificate.
 
 where `foo` is the hardcoded client ID for this test server.
